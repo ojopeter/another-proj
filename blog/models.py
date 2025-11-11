@@ -3,6 +3,13 @@ from django.utils import timezone
 from django.conf import settings
 
 # Create your models here.
+class Published(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(status=Post.Status.PUBLISHED)
+
+class David(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(author__username='davido')
 class Post(models.Model):
     class Status(models.TextChoices):
         DRAFT = 'DF','Draft'
@@ -15,7 +22,9 @@ class Post(models.Model):
     status = models.CharField(max_length=2,choices=Status.choices,default=Status.DRAFT)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    
+    objects = models.Manager()
+    published =Published()
+    david = David()
     class Meta:
         ordering = ['-publish']
         indexes = [
