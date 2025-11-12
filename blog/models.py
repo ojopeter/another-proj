@@ -40,13 +40,14 @@ class Post(models.Model):
     
     # This is a way to slug
     def save(self, *args, **kwargs):
-        base_slug = slugify(self.title)
-        slug = base_slug
-        num = 1
-        while Post.objects.filter(slug=slug).exists():
-           slug = f'{base_slug} -{num}'
-           num+=1
-        self.slug = slug
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            num = 1
+            while Post.objects.filter(slug=slug).exists():
+                slug = f'{base_slug}-{num}'
+                num+=1
+            self.slug = slug
         super().save(*args,**kwargs)
         
     def get_absolute_url(self):
