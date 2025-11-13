@@ -6,7 +6,9 @@ def post_list(request):
     posts = Post.objects.all()
     paginator = Paginator(posts,3)
     page_number = request.GET.get('page',1)
-    page_obj = paginator.get_page(page_number)
+    posts = paginator.get_page(page_number)
+    return render(request, 'blog/post/list.html',{'posts':posts})
+
 def post_detail(request, post):
     post = get_object_or_404(Post,slug=post,status=Post.Status.PUBLISHED)
     return render(request, 'blog/post/detail.html',{'post':post})
