@@ -5,7 +5,7 @@ from .forms import EmailPostForm
 from django.core.mail import send_mail
 
 def post_list(request):
-    posts = Post.objects.all()
+    posts = Post.published.all()
     paginator = Paginator(posts,3)
     page_number = request.GET.get('page',1)
     posts = paginator.get_page(page_number)
@@ -22,7 +22,7 @@ def post_share(request, post_id):
         form = EmailPostForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            post_url = request.build_absolute_url(post.get_absolute_url)
+            post_url = request.build_absolute_uri(post.get_absolute_url)
             subject = (f"{cd['name']} ({cd['email']})"
                        f"recommends you read {post.title}")
             message = (
@@ -32,9 +32,9 @@ def post_share(request, post_id):
             send_mail(
                 subject=subject,
                 message=message,
-                from_email=None,
+                from_email=form.cleaned_data['email'],
                 recipient_list =[cd['to']])
             sent = True
     else:
         form = EmailPostForm()
-    return render(request, 'blog/post/share.html', {'post': post, 'form': 'form', 'sent':sent})
+    return render(request, 'blog/post/share.html', {'post': post, 'form': form, 'sent':sent})
